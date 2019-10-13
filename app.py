@@ -60,6 +60,8 @@ def calls():
     date_from=request.args.get('date_from')
     date_to=request.args.get('date_till')
     calls, calls_map = get_files(token, cache, date_from, date_to)
+
+    #записываем в сессию звонки и маппинг звонков и файлов, это будет нужно при скачивании записей звонков
     session['calls'] = calls
     session['calls_map'] = calls_map
     return jsonify({'calls': calls})
@@ -115,4 +117,4 @@ def operators():
 
 
 if __name__ == "__main__":
-    app.run(debug=True, ssl_context='adhoc')
+    app.run(ssl_context='adhoc')

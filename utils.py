@@ -35,6 +35,7 @@ def _get_wav_files(y: yadisk.yadisk.YaDisk) -> List[dict]:
 
 
 def get_files(token:str, cache:dict, date_from:str = None, date_to:str = None) -> Tuple[List[dict], List[dict]]:
+    '''Функция получает список звонков и маппинг названий файлов звонов со ссылками на их скачивание'''
     date_from = date_from if date_from else 0
     date_to = date_to if date_to else 9999999999999
     
