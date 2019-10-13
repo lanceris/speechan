@@ -45,7 +45,7 @@ def authorize():
 @app.route('/', methods=['GET'])
 def index():
     if session.get('yadisk'):
-        # т.к не было указания, что возвращать с "/", я решил вернуть список эндпоинтов
+        # returns list of endpoints
         endpoints = [str(point) for point in app.url_map.iter_rules() if 'static' not in str(point)]
         return jsonify({'endpoints': endpoints})
     return redirect('/login')
@@ -61,7 +61,6 @@ def calls():
     date_to=request.args.get('date_till')
     calls, calls_map = get_files(token, cache, date_from, date_to)
 
-    #записываем в сессию звонки и маппинг звонков и файлов, это будет нужно при скачивании записей звонков
     session['calls'] = calls
     session['calls_map'] = calls_map
     return jsonify({'calls': calls})
@@ -83,7 +82,7 @@ def recording():
         call_entry = session['calls_map'][call_id]
 
         r = requests.get(call_entry['url']) 
-        strIO = BytesIO(r.content) # получаем файл
+        strIO = BytesIO(r.content) # gets bytes repr of the file
         return send_file(strIO, as_attachment=True, attachment_filename=call_entry['filename'])
     except requests.exceptions.MissingSchema:
         return jsonify({'error': 'Url for call_id={} is incorrect: {}'.format(call_id, call_entry['url'])})
