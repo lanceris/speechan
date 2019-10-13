@@ -1,16 +1,17 @@
 from datetime import datetime
-import json
-import os
 from io import BytesIO
+import os
+
 
 from authlib.flask.client import OAuth
-from flask import Flask, jsonify, redirect, session, url_for, render_template, request, send_file
+from flask import Flask, jsonify, redirect, session, url_for, request, send_file
+import requests
 import pandas as pd
 import yadisk
-import requests
+
 
 from settings import app_id, app_pwd, secret_key
-from utils import get_result
+from utils import get_files
 
 app = Flask(__name__)
 app.secret_key = secret_key
@@ -44,8 +45,8 @@ def authorize():
 @app.route('/', methods=['GET'])
 def index():
     if session.get('yadisk'):
+        # т.к не было указания, что возвращать с "/", я решил вернуть список эндпоинтов
         endpoints = [str(point) for point in app.url_map.iter_rules() if 'static' not in str(point)]
-        return(session['calls_map'])
         return jsonify({'endpoints': endpoints})
     return redirect('/login')
 
@@ -58,7 +59,7 @@ def calls():
     token = session['yadisk']['access_token']
     date_from=request.args.get('date_from')
     date_to=request.args.get('date_till')
-    calls, calls_map = get_result(token, cache, date_from, date_to)
+    calls, calls_map = get_files(token, cache, date_from, date_to)
     session['calls'] = calls
     session['calls_map'] = calls_map
     return jsonify({'calls': calls})
@@ -90,10 +91,27 @@ def recording():
 
 @app.route('/operators')
 def operators():
-    if not session['calls_map']:
-        return jsonify({'error': 'Calls not found. Go to /calls to get one.'})
+    operators = [
+		{
+			"phone_number": "101",
+			"name": "Иванов Иван",
+		},
+		{
+			"phone_number": "102",
+			"name": "Петрова Мария",
+		},
+        {
+			"phone_number": "103",
+			"name": "Васильева Анастасия",
+		},
+		{
+			"phone_number": "104",
+			"name": "Смирнов Михаил",
+		},
 
-    return NOT_IMPLEMENTED
+	]
+
+    return jsonify({'operators': operators})
 
 
 if __name__ == "__main__":
